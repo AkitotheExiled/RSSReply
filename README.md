@@ -71,7 +71,7 @@ https://n4g.com/rss/news?channel=next-gen&sort=latest
 ### Installation for Home PC
 * Open up your Command Prompt again, type 
 ```
-pip install requirements.txt
+python pip install requirements.txt
 ```
 * Download the ZIP file and extract the contents to your desktop
 * Open the config.ini file and place your information inside and save the file
