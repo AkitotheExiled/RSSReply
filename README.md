@@ -1,5 +1,5 @@
 
-# RSSParser-AutoReply
+# RSSReply
 
 ### Description
 A script that takes information from a RSS Feed and submits it onto your subreddit of choice!
@@ -99,7 +99,7 @@ DELAY=300
 * Open up your command prompt
 * Navigate to the directory your bot is in
 ```
-cd desktop/RSSParser-AutoReply
+cd desktop/RSSReply
 ```
 * Type the following
 ```
@@ -110,7 +110,7 @@ python parsereplybot.py
 *The bot is now running!*
 
 ### Contributing
-Issue Tracker: https://github.com/AkitotheExiled/RSSParser-AutoReply/issues
+Issue Tracker: https://github.com/AkitotheExiled/RSSReply/issues
 
 ### Contact
 https://www.reddit.com/user/ScoopJr
