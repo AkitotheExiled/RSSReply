@@ -83,9 +83,9 @@ DELAY=300
 ```
 * Now lets move on to the Running your script section.
 
-### NOTE BEFORE RUNNING
-* The account that you are running the script on must be a moderator in the subreddit you are running!
-
+### PREQ BEFORE RUNNING THE SCRIPT
+1. Make sure the account you will run the script on is a moderator of the subreddit it will be posting in.
+2. We need to install requirements.txt before continuing.  Please follow the steps below in Running your script section to get started.
 *I.E. ScoopJr is a moderator of Kgamers, where I test all my scripts.*
 
 ### Running your script
@@ -102,12 +102,16 @@ C:\Users\AkitotheExiled>
 C:\Users\AkitotheExiled\Desktop\RSSReply-master>
 ```
 
-3. Time to run our script!  In the command prompt, type, **python parsereplybot.py**.  Your command prompt should match the below text
+3. Installing requirements.txt so our script can be ran.  In the command prompt, type **python pip install requirements.txt**.  Press enter and wait for the command to finish.  
+```
+C:\Users\AkitotheExiled\Desktop\RSSReply-master>python pip install requirements.txt
+```
+4. Time to run our script!  In the command prompt, type, **python parsereplybot.py**.  Your command prompt should match the below text
 
 ```
 C:\Users\AkitotheExiled\Desktop\RSSReply-master>python parsereplybot.py
 ```
-4. Press the enter key on your keyboard.  The script should run now.
+5. Press the enter key on your keyboard.  The script should run now.
 
 
 ### Contributing
