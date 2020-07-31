@@ -102,7 +102,7 @@ C:\Users\AkitotheExiled>
 C:\Users\AkitotheExiled\Desktop\RSSReply-master>
 ```
 
-3. Time to run our script!  In the command prompt, type, python parsereplybot.py.  Your command prompt should match the below text
+3. Time to run our script!  In the command prompt, type, **python parsereplybot.py**.  Your command prompt should match the below text
 
 ```
 C:\Users\AkitotheExiled\Desktop\RSSReply-master>python parsereplybot.py
