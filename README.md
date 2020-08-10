@@ -79,7 +79,7 @@ SECRET= daklfanlfkanl392r29neorfjs
 ```
 
 **Client_ID**
-* Look at SourceRequestBot by ScoopJr, and right under Personal Use Script, is our client_id
+* Look at ParseNReply by ScoopJr, and right under Personal Use Script, is our client_id
 * Copy the text and save it somewhere
 
 ```
