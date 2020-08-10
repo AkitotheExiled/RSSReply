@@ -26,7 +26,7 @@ A script that takes information from a RSS Feed and submits it onto your subredd
 
 ## Installing Python
 * Download [Python 3.7](https://www.python.org/downloads/release/python-370/)
-* Add Python to Path by selecting box during installation or [manually adding to Path](https://datatofish.com/add-python-to-windows-path/)
+* During installation - Select the checkbox Add Python to Path or [manually adding to Path](https://datatofish.com/add-python-to-windows-path/)
 * Open up Command Prompt and type "python", it should tell you the version if its installed correctly.
 ```
 Python 3.7.3 (v3.7.3:ef4ec6ed12, Mar 25 2019, 21:26:53) [MSC v.1916 32 bit (Intel)] on win32
