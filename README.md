@@ -110,8 +110,8 @@ DELAY=300
 - - - -
 ### Putting it together
 * On your desktop, navigate to the extracted folder, RSSReply-master and open it. 
-* Open config.ini and it should look something like this.
-* Enter in your information from before and select save!
+* Open the config.ini file
+* Enter in your information that we've been gathering and save it!
 
 **It should now look like this!**
 
