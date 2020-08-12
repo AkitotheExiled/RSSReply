@@ -14,6 +14,7 @@ A script that takes information from a RSS Feed and submits it onto your subredd
         * [delay](#delay)
         * [subreddit](#subreddit)
         * [rssurl](#rss-feed)
+        * [run_once](#run-once)
         * [Putting it all together](#putting-it-together)
 * [Running your script](#running-your-script)
 * [Bug tracking](#contributing)
@@ -86,6 +87,12 @@ SECRET= daklfanlfkanl392r29neorfjs
 CLIENT_ID= ddMaksjJsuyeb
 ```
 
+### Delay
+* The time in seconds before fetching the RSS feed again.
+* **This does not have an effect when RUN_ONCE=true**
+```
+DELAY=300
+```
 
 ### Subreddit
 * The subreddit you will be running the program in!
@@ -100,10 +107,11 @@ mysubredditexample
 RSSURL = https://n4g.com/rss/news?channel=next-gen&sort=latest
 ```
 
-### Delay
-* The time in seconds before fetching the RSS feed again.
+### Run once
+* When true, the script will run one time and then exit. **DELAY DOES NOT AFFECT WHEN TRUE**
+* When false, the script will loop many times waiting DELAY seconds between runs.
 ```
-DELAY=300
+RUN_ONCE=false
 ```
 
 
@@ -124,7 +132,7 @@ SECRET=daklfanlfkanl392r29neorfjs
 SUBREDDIT=mysubredditexample
 RSSURL=https://n4g.com/rss/news?channel=next-gen&sort=latest
 DELAY=300
-
+RUN_ONCE=false
 ```
 - - - -
 
