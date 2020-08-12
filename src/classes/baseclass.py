@@ -20,6 +20,7 @@ class RedditBaseClass:
             self.delay = self.CONFIG.getint('main', 'DELAY')
             self.subreddit = self.CONFIG.get('main', 'SUBREDDIT')
             self.rss_url = self.CONFIG.get('main', 'RSSURL')
+            self.run_once = self.CONFIG.getboolean('main', 'RUN_ONCE')
             self.log = Logger()
             self.logger = self.log.logger
         except Exception:

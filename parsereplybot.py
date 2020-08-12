@@ -103,8 +103,11 @@ class Parse_Reply_Bot(RedditBaseClass):
                                     pass
                         else:
                             print(f"Title: {item['title']} already exists in {self.subreddit}. Continuing...")
-            print(f"Waiting {self.delay} seconds before attempting to pull another article.")
-            time.sleep(self.delay)
+            if self.run_once:
+                break
+            else:
+                print(f"Waiting {self.delay} seconds before attempting to pull another article.")
+                time.sleep(self.delay)
 
 
 
