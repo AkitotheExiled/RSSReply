@@ -88,8 +88,6 @@ class Parse_Reply_Bot(RedditBaseClass):
                     for item in data["data"]:
                         link = item["link"]
                         title = item["title"]
-                        if "n4g" in title.lower():
-                            continue
                         does_exist = self.exist_check_or_add_posts(Articles, id=item["id"], title=item["title"], link=item["link"])
                         if not does_exist:
                             while True:

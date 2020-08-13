@@ -6,15 +6,19 @@ def get_links_titles_guuids(text):
     data = {"data": []}
     count = 0
     count2 = 0
-    titles = soup.find_all("title")
-    links = soup.find_all("link")
-    guids =  soup.find_all("guid")
-    for (guid, title, link) in zip(guids, titles, links):
-        data["data"].append({"id": guid.text})
-        data["data"][count]["title"] = titles[count].text
-        data["data"][count]["link"] = links[count].text
-        count += 1
-    return data
+    try:
+        items = soup.find_all("item")
+        for item in items:
+            guid = item.guid.text
+            if guid == "":
+                guid = item.link.text
+            data["data"].append({"id": guid})
+            data["data"][count2]["title"] = item.title.text
+            data["data"][count2]["link"] = item.link.text
+            count2 += 1
+        return data
+    except Exception as e:
+        print(e)
 
 
 
