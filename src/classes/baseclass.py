@@ -6,7 +6,7 @@ import os
 temp_path = os.path.dirname(os.path.abspath(__file__))
 config = os.path.join(temp_path, "../../config.ini")
 print(config)
-FEEDTYPE = {"latest": 3, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "all": 10000}
+FEEDTYPE = {"latest": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "all": 10000}
 
 def get_int(possible_integer):
     try:
