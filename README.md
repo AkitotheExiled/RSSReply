@@ -117,7 +117,12 @@ RUN_ONCE=false
 
 ### Feed type
 * Sometimes RSS feeds contain more than one item(item indicates latest articles/mangas).
-* You can do the following feed_types, latest, 1-10, one-ten, all.  I recommend latest as most rss feeds will only ever have one item and the ones that have multiples, the latest article/manga/post is in that one item.
+* You can do the following feed_types, 
+* latest *Grabs the first item only.*
+* 1-10 *Grabs 1,2,3,4,etc items.*
+* one-ten *Grabs one,two,three,four,etc items.* 
+* all  *Grabs all items available, meaning if your rss feed has items with links from 2018-2020.  It will post every article from 2018-2020.*  
+* **I recommend latest as most rss feeds will only ever have one item and the ones that have multiples, the latest article/manga/post is in that one item.**
 ```
 FEED_TYPE=latest
 ```
