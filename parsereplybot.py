@@ -93,10 +93,14 @@ class Parse_Reply_Bot(RedditBaseClass):
             if rss_text:
                 data = get_links_titles_guuids(text=rss_text)
                 if data:
+                    i = 0
                     for item in data["data"]:
+                        if i == self.count:
+                            break
                         link = item["link"]
                         title = item["title"]
                         title_exist = self.exist_check_and_dont_add(Articles, title=item["title"])
+                        i+=1
                         if title_exist:
                             continue
                         else:
