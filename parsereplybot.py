@@ -17,14 +17,14 @@ class Parse_Reply_Bot(RedditBaseClass):
 
     def __init__(self):
         super().__init__()
-        self.user_agent = "PC:ParseNReply :V1.0 by ScoopJr"
+        self.user_agent = "PC:ParseNReply :V1.03 by ScoopJr"
         print('Starting up...', self.user_agent)
         self.reddit = praw.Reddit(client_id=self.client,
                                   client_secret=self.secret,
                                   password=self.password,
                                   user_agent=self.user_agent,
                                   username=self.user)
-
+        self.reddit.validate_on_submit = True
         self.queue = {"data": []}
         self.db = Database()
         self.log = Logger()
@@ -62,6 +62,14 @@ class Parse_Reply_Bot(RedditBaseClass):
             except Exception as e:
                 print(e)
 
+    def exist_check_and_dont_add(self, model, **kwargs):
+        instance = self.db.session.query(model).filter_by(**kwargs).first()
+        if instance:
+            print(instance)
+            return True
+        else:
+            return False
+
     def get_text_from_rssfeed(self):
         url = "https://n4g.com/rss/news?channel=next-gen&sort=latest"
         headers = {'User-Agent': self.user_agent}
@@ -88,19 +96,24 @@ class Parse_Reply_Bot(RedditBaseClass):
                     for item in data["data"]:
                         link = item["link"]
                         title = item["title"]
-                        does_exist = self.exist_check_or_add_posts(Articles, id=item["id"], title=item["title"], link=item["link"])
-                        if not does_exist:
-                            while True:
-                                try:
-                                    self.reddit.subreddit(self.subreddit).submit(title, url=link)
-                                    print(f"Posting in {self.subreddit}, title: {item['title']}")
-                                    break
-                                except APIException as exception:
-                                    self.logger.info("Error has occurred within the API", exc_info=True)
-                                    time.sleep(self.error_delay)
-                                    pass
+                        title_exist = self.exist_check_and_dont_add(Articles, title=item["title"])
+                        if title_exist:
+                            continue
                         else:
-                            print(f"Title: {item['title']} already exists in {self.subreddit}. Continuing...")
+                            does_exist = self.exist_check_or_add_posts(Articles, id=item["id"], title=item["title"],
+                                                                   link=item["link"])
+                            if not does_exist:
+                                while True:
+                                    try:
+                                        self.reddit.subreddit(self.subreddit).submit(title, url=link)
+                                        print(f"Posting in {self.subreddit}, title: {item['title']}")
+                                        break
+                                    except APIException as exception:
+                                        self.logger.info("Error has occurred within the API", exc_info=True)
+                                        time.sleep(self.error_delay)
+                                        pass
+                            else:
+                                print(f"Title: {item['title']} already exists in {self.subreddit}. Continuing...")
             if self.run_once:
                 break
             else:

@@ -24,8 +24,8 @@ class Database:
 class Articles(Base):
     __tablename__ = 'articles'
 
-    id = Column(String(30), primary_key=True)
-    title = Column(String(100), unique=True)
+    id = Column(String(50), primary_key=True)
+    title = Column(String(200))
     link = Column(String(500))
 
     def __init__(self, id, title, link):
