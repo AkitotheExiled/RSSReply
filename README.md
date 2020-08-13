@@ -15,6 +15,7 @@ A script that takes information from a RSS Feed and submits it onto your subredd
         * [subreddit](#subreddit)
         * [rssurl](#rss-feed)
         * [run_once](#run-once)
+        * [feed_type](#feed-type)
         * [Putting it all together](#putting-it-together)
 * [Running your script](#running-your-script)
 * [Bug tracking](#contributing)
@@ -114,6 +115,12 @@ RSSURL = https://n4g.com/rss/news?channel=next-gen&sort=latest
 RUN_ONCE=false
 ```
 
+### Feed type
+* Sometimes RSS feeds contain more than one item(item indicates latest articles/mangas).
+* You can do the following feed_types, latest, 1-10, one-ten, all.  I recommend latest as most rss feeds will only ever have one item and the ones that have multiples, the latest article/manga/post is in that one item.
+```
+FEED_TYPE=latest
+```
 
 - - - -
 ### Putting it together
@@ -133,6 +140,7 @@ SUBREDDIT=mysubredditexample
 RSSURL=https://n4g.com/rss/news?channel=next-gen&sort=latest
 DELAY=300
 RUN_ONCE=false
+FEED_TYPE=latest
 ```
 - - - -
 
