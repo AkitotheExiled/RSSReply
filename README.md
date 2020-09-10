@@ -166,5 +166,8 @@ Issue Tracker: https://github.com/AkitotheExiled/RSSReply/issues
 https://www.reddit.com/user/ScoopJr
 
 
+### To-do List
+- [ ] Adding support for multiple subreddits/feeds 
+
 
 
