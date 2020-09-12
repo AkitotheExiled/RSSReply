@@ -17,7 +17,7 @@ class Parse_Reply_Bot(RedditBaseClass):
 
     def __init__(self):
         super().__init__()
-        self.user_agent = "PC:ParseNReply :V1.03 by ScoopJr"
+        self.user_agent = "PC:ParseNReply :V1.04 by ScoopJr"
         print('Starting up...', self.user_agent)
         self.reddit = praw.Reddit(client_id=self.client,
                                   client_secret=self.secret,
@@ -27,8 +27,6 @@ class Parse_Reply_Bot(RedditBaseClass):
         self.reddit.validate_on_submit = True
         self.queue = {"data": []}
         self.db = Database()
-        self.log = Logger()
-        self.logger = self.log.logger
         self.error_delay = 140
 
 
@@ -58,71 +56,75 @@ class Parse_Reply_Bot(RedditBaseClass):
                 instance = model(**kwargs)
                 self.db.session.add(instance)
                 self.db.session.commit()
+                self.delay = self.defaultdelay
                 return False
             except Exception as e:
-                print(e)
+                self.logger.error("Error getting data from rss feed", exc_info=True)
 
     def exist_check_and_dont_add(self, model, **kwargs):
         instance = self.db.session.query(model).filter_by(**kwargs).first()
         if instance:
-            print(instance)
+            self.delay+=10
             return True
         else:
             return False
 
-    def get_text_from_rssfeed(self):
-        url = "https://n4g.com/rss/news?channel=next-gen&sort=latest"
+    def get_text_from_rssfeed(self,url):
         headers = {'User-Agent': self.user_agent}
         try:
             while True:
                 print("Attempting to get rss feed info...")
-                data = requests.get(self.rss_url, headers=headers)
+                data = requests.get(url, headers=headers)
                 if data.status_code == requests.codes.ok:
                     if data:
                         return data.text
                     else:
                         time.sleep(self.delay)
         except Exception:
-            self.logger.info("Error getting data from rss feed", exc_info=True)
+            self.logger.error("Error getting data from rss feed", exc_info=True)
 
 
     def main(self):
         while True:
-            print(f"Getting RSS Feed... from {self.rss_url}")
-            rss_text = self.get_text_from_rssfeed()
-            if rss_text:
-                data = get_links_titles_guuids(text=rss_text)
-                if data:
-                    i = 0
-                    for item in data["data"]:
-                        if i == self.count:
-                            break
-                        link = item["link"]
-                        title = item["title"]
-                        title_exist = self.exist_check_and_dont_add(Articles, title=item["title"])
-                        i+=1
-                        if title_exist:
-                            continue
-                        else:
-                            does_exist = self.exist_check_or_add_posts(Articles, id=item["id"], title=item["title"],
-                                                                   link=item["link"])
-                            if not does_exist:
-                                while True:
-                                    try:
-                                        self.reddit.subreddit(self.subreddit).submit(title, url=link)
-                                        print(f"Posting in {self.subreddit}, title: {item['title']}")
-                                        break
-                                    except APIException as exception:
-                                        self.logger.info("Error has occurred within the API", exc_info=True)
-                                        time.sleep(self.error_delay)
-                                        pass
+            for subart in self.subrss:
+                sub = subart["subreddit"]
+                rssurl = subart["rssurl"]
+                print(f"Getting RSS Feed... from {rssurl}")
+                rss_text = self.get_text_from_rssfeed(rssurl)
+                if rss_text:
+                    data = get_links_titles_guuids(text=rss_text)
+                    if data:
+                        i = 0
+                        for item in data["data"]:
+                            if i == self.count:
+                                break
+                            link = item["link"]
+                            title = item["title"]
+                            title_exist = self.exist_check_and_dont_add(Articles, title=item["title"])
+                            i+=1
+                            if title_exist:
+                                print(f"Article: {title}, already exists in the database/subreddit!")
+                                continue
                             else:
-                                print(f"Title: {item['title']} already exists in {self.subreddit}. Continuing...")
-            if self.run_once:
-                break
-            else:
-                print(f"Waiting {self.delay} seconds before attempting to pull another article.")
-                time.sleep(self.delay)
+                                does_exist = self.exist_check_or_add_posts(Articles, id=item["id"], title=item["title"],
+                                                                       link=item["link"])
+                                if not does_exist:
+                                    while True:
+                                        try:
+                                            self.reddit.subreddit(sub).submit(title, url=link)
+                                            print(f"Posting in {sub}, title: {item['title']}")
+                                            break
+                                        except APIException as exception:
+                                            self.logger.error("Error has occurred within the API", exc_info=True)
+                                            time.sleep(self.error_delay)
+                                            pass
+                                else:
+                                    print(f"Title: {item['title']} already exists in {sub}. Continuing...")
+                if self.run_once:
+                    break
+                else:
+                    print(f"Waiting {self.delay} seconds before attempting to pull next subreddit/article.")
+                    time.sleep(self.delay)
 
 
 

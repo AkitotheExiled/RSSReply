@@ -3,11 +3,12 @@ import static
 
 class Logger:
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)
+        logging.basicConfig()
+        self.log = logging.getLogger(__name__)
+        self.log.setLevel(logging.INFO)
         self.handler = logging.FileHandler(static.LOGGER_NAME)
-        self.handler.setLevel(logging.DEBUG)
+        self.handler.setLevel(logging.INFO)
 
         self.formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         self.handler.setFormatter(self.formatter)
-        self.logger.addHandler(self.handler)
+        self.log.addHandler(self.handler)
