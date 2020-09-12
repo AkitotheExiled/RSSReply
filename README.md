@@ -102,10 +102,10 @@ mysubredditexample
 ```
 
 ### Rss feed
-* The RSS feed the bot pulls from.
+* The RSS FEED the program will query for information. **Now you can use multiple feeds/subreddits**
 * [How to find an rss feed's url](https://rss.com/blog/find-rss-feed/)
 ```
-RSSURL = https://n4g.com/rss/news?channel=next-gen&sort=latest
+https://n4g.com/rss/news?channel=next-gen&sort=latest
 ```
 
 ### Run once
@@ -141,11 +141,13 @@ USER =user123
 PASSWORD=myultrasecretpassword
 CLIENT_ID=ddMaksjJsuyeb
 SECRET=daklfanlfkanl392r29neorfjs
-SUBREDDIT=mysubredditexample
-RSSURL=https://n4g.com/rss/news?channel=next-gen&sort=latest
 DELAY=300
 RUN_ONCE=false
 FEED_TYPE=latest
+
+[suburl]
+mysubredditexample : https://n4g.com/rss/news?channel=next-gen&sort=latest
+mysecondsubreddit : https://n4g.com/rss/news?channel=ps3&sort=latest
 ```
 - - - -
 
@@ -167,7 +169,7 @@ https://www.reddit.com/user/ScoopJr
 
 
 ### To-do List
-- [ ] Adding support for multiple subreddits/feeds 
+- [x] Adding support for multiple subreddits/feeds COMPLETED 9/11/20
 
 
 
