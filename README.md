@@ -16,6 +16,7 @@ A script that takes information from a RSS Feed and submits it onto your subredd
         * [rssurl](#rss-feed)
         * [run_once](#run-once)
         * [feed_type](#feed-type)
+        * [flairids](#flair-ids)
         * [Putting it all together](#putting-it-together)
 * [Running your script](#running-your-script)
 * [Bug tracking](#contributing)
@@ -126,6 +127,13 @@ RUN_ONCE=false
 ```
 FEED_TYPE=latest
 ```
+### Flair ids
+* Flair ids are not required.  Script will issue a warning if no flair ids are mentioned.
+* Grab the flair id for post flairs from your subreddit
+* *Flair count must match subreddit count(2 subreddits, 2 flair-template ids needed).*
+```
+jf82hh3-328dh328-dfj2384r2h,2390423-jfsdf832-fsjsfj28
+```
 
 - - - -
 ### Putting it together
@@ -148,6 +156,9 @@ FEED_TYPE=latest
 [suburl]
 mysubredditexample : https://n4g.com/rss/news?channel=next-gen&sort=latest
 mysecondsubreddit : https://n4g.com/rss/news?channel=ps3&sort=latest
+
+[flairs]
+FLAIR_IDS=jf82hh3-328dh328-dfj2384r2h,2390423-jfsdf832-fsjsfj28
 ```
 - - - -
 
@@ -170,6 +181,7 @@ https://www.reddit.com/user/ScoopJr
 
 ### To-do List
 - [x] Adding support for multiple subreddits/feeds COMPLETED 9/11/20
+- [x] Added support for flair-template ids for multiple subreddits COMPLETED 9/13/20
 
 
 
