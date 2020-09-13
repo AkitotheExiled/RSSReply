@@ -17,7 +17,7 @@ class Parse_Reply_Bot(RedditBaseClass):
 
     def __init__(self):
         super().__init__()
-        self.user_agent = "PC:ParseNReply :V1.04 by ScoopJr"
+        self.user_agent = "PC:ParseNReply :V1.05 by ScoopJr"
         print('Starting up...', self.user_agent)
         self.reddit = praw.Reddit(client_id=self.client,
                                   client_secret=self.secret,
@@ -89,6 +89,7 @@ class Parse_Reply_Bot(RedditBaseClass):
             for subart in self.subrss:
                 sub = subart["subreddit"]
                 rssurl = subart["rssurl"]
+                flairid = subart["flair"]
                 print(f"Getting RSS Feed... from {rssurl}")
                 rss_text = self.get_text_from_rssfeed(rssurl)
                 if rss_text:
@@ -111,7 +112,12 @@ class Parse_Reply_Bot(RedditBaseClass):
                                 if not does_exist:
                                     while True:
                                         try:
-                                            self.reddit.subreddit(sub).submit(title, url=link)
+                                            submission = self.reddit.subreddit(sub).submit(title, url=link)
+                                            if self.reddit.subreddit(sub).user_is_moderator:
+                                                submission.mod.sticky()
+                                                submission.mod.approve()
+                                                if flairid is not None:
+                                                    submission.mod.flair(flair_template_id=flairid)
                                             print(f"Posting in {sub}, title: {item['title']}")
                                             break
                                         except APIException as exception:
