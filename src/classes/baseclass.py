@@ -25,7 +25,7 @@ class RedditBaseClass:
         log = Logger()
         self.logger = log.log
         try:
-            self.CONFIG = ConfigParser(defaults=None)
+            self.CONFIG = ConfigParser(defaults=None, interpolation=None)
             self.CONFIG.read(config)
         # Retrieving User information from config.ini for PRAW
             self.user = self.CONFIG.get('main', 'USER')
