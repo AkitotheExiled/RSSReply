@@ -112,7 +112,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                                 if not does_exist:
                                     while True:
                                         try:
-                                            submission = self.reddit.subreddit(sub).submit(title, url=link)
+                                            submission = self.reddit.subreddit(sub).submit(title, url=link, resubmit=False)
                                             if self.reddit.subreddit(sub).user_is_moderator:
                                                 submission.mod.sticky()
                                                 submission.mod.approve()
@@ -123,7 +123,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                                         except APIException as exception:
                                             self.logger.error("Error has occurred within the API", exc_info=True)
                                             time.sleep(self.error_delay)
-                                            pass
+                                            break
                                 else:
                                     print(f"Title: {item['title']} already exists in {sub}. Continuing...")
                 if self.run_once:
