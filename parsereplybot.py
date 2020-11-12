@@ -1,5 +1,5 @@
 import praw
-from praw.exceptions import APIException
+from praw.exceptions import APIException, RedditAPIException
 import os
 import requests, requests.auth
 from src.classes.baseclass import RedditBaseClass
@@ -17,7 +17,7 @@ class Parse_Reply_Bot(RedditBaseClass):
 
     def __init__(self):
         super().__init__()
-        self.user_agent = "PC:ParseNReply :V1.05 by ScoopJr"
+        self.user_agent = "PC:ParseNReply :V1.06 by ScoopJr"
         print('Starting up...', self.user_agent)
         self.reddit = praw.Reddit(client_id=self.client,
                                   client_secret=self.secret,
@@ -69,7 +69,7 @@ class Parse_Reply_Bot(RedditBaseClass):
         else:
             return False
 
-    def get_text_from_rssfeed(self,url):
+    def get_text_from_rssfeed(self, url):
         headers = {'User-Agent': self.user_agent}
         try:
             while True:
@@ -91,41 +91,41 @@ class Parse_Reply_Bot(RedditBaseClass):
                 rssurl = subart["rssurl"]
                 flairid = subart["flair"]
                 print(f"Getting RSS Feed... from {rssurl}")
-                rss_text = self.get_text_from_rssfeed(rssurl)
-                if rss_text:
-                    data = get_links_titles_guuids(text=rss_text)
-                    if data:
-                        i = 0
-                        for item in data["data"]:
-                            if i == self.count:
-                                break
-                            link = item["link"]
-                            title = item["title"]
-                            title_exist = self.exist_check_and_dont_add(Articles, title=item["title"])
-                            i+=1
-                            if title_exist:
-                                print(f"Article: {title}, already exists in the database/subreddit!")
-                                continue
-                            else:
-                                does_exist = self.exist_check_or_add_posts(Articles, id=item["id"], title=item["title"],
-                                                                       link=item["link"])
-                                if not does_exist:
-                                    while True:
-                                        try:
-                                            submission = self.reddit.subreddit(sub).submit(title, url=link, resubmit=False)
-                                            if self.reddit.subreddit(sub).user_is_moderator:
-                                                submission.mod.sticky()
-                                                submission.mod.approve()
-                                                if flairid is not None:
-                                                    submission.mod.flair(flair_template_id=flairid)
-                                            print(f"Posting in {sub}, title: {item['title']}")
-                                            break
-                                        except APIException as exception:
-                                            self.logger.error("Error has occurred within the API", exc_info=True)
-                                            time.sleep(self.error_delay)
-                                            break
+                for url in rssurl.get_url():
+                    rss_text = self.get_text_from_rssfeed(url)
+                    if rss_text:
+                        data = get_links_titles_guuids(text=rss_text)
+                        if data:
+                            i = 0
+                            for item in data["data"]:
+                                if i == self.count:
+                                    break
+                                link = item["link"]
+                                title = item["title"]
+                                title_exist = self.exist_check_and_dont_add(Articles, title=item["title"])
+                                i+=1
+                                if title_exist:
+                                    print(f"Article: {title}, already exists in the database/subreddit!")
+                                    continue
                                 else:
-                                    print(f"Title: {item['title']} already exists in {sub}. Continuing...")
+                                    does_exist = self.exist_check_or_add_posts(Articles, id=item["id"], title=item["title"],
+                                                                           link=item["link"])
+                                    if not does_exist:
+                                        while True:
+                                            try:
+                                                submission = self.reddit.subreddit(sub).submit(title, url=link, resubmit=False)
+                                                if self.reddit.subreddit(sub).user_is_moderator:
+                                                    submission.mod.approve()
+                                                    if flairid is not None:
+                                                        submission.mod.flair(flair_template_id=flairid)
+                                                print(f"Posting in {sub}, title: {item['title']}")
+                                                break
+                                            except (APIException, RedditAPIException):
+                                                self.logger.error("Error has occurred within the API", exc_info=True)
+                                                time.sleep(self.error_delay)
+                                                break
+                                    else:
+                                        print(f"Title: {item['title']} already exists in {sub}. Continuing...")
                 if self.run_once:
                     break
                 else:

@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 from configparser import NoSectionError, NoOptionError
-from src.database.database import Database
+from src.classes.flair import Flair
+from src.classes.rssurl import Rssurl
 from src.classes.logger import Logger
 import os, sys
 
@@ -38,22 +39,23 @@ class RedditBaseClass:
             self.count = get_int(self.CONFIG.get('main', 'FEED_TYPE'))
             self.subrss = []
             try:
-                self.flairids = self.CONFIG.get('flairs', 'FLAIR_IDS')
+                self.flairids = Flair(self.CONFIG.get('flairs', 'FLAIR_IDS'))
             except NoOptionError:
                 self.logger.warning("Flair section could not be found! Script will continue without flairs.",
                                   exc_info=True)
                 self.flairids = None
             try:
                 for k,v in self.CONFIG.items('suburl'):
-                    self.subrss.append({"subreddit": k, "rssurl": v, "flair": None})
+                    rssurl = Rssurl(v)
+                    self.subrss.append({"subreddit": k, "rssurl": rssurl, "flair": None})
             except NoSectionError as e:
                 self.logger.error("Section: ['suburl'] could not be found!  Please check your config.ini file!", exc_info=True)
                 raise Exception("Section: ['suburl'] could not be found!  Please check your config.ini file!") from e
             if self.flairids is not None:
-                if "-" not in self.flairids:
+                if not self.flairids.is_template():
                     raise Exception("You need to use a flair template id!  I.E. 8923hdnd-3829493f-1383eh28 and not a flair name!")
-                if "," in self.flairids:
-                    self.flairids = self.flairids.split(",")
+                if self.flairids.is_list():
+                    self.flairids = self.flairids.to_l()
                     if len(self.flairids) != len(self.subrss):
                         raise Exception("Your subreddits/feeds amount does not match your flairids amount.")
                     else:
