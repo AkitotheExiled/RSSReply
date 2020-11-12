@@ -105,8 +105,15 @@ mysubredditexample
 ### Rss feed
 * The RSS FEED the program will query for information. **Now you can use multiple feeds/subreddits**
 * [How to find an rss feed's url](https://rss.com/blog/find-rss-feed/)
+* **NEW** Added ability to have more than one rss feed for your subreddit
 ```
 https://n4g.com/rss/news?channel=next-gen&sort=latest
+```
+
+**NEW MULTIPLE FEEDS**
+* Separate each rss url with a comma
+```
+yoursubreddit : https://n4g.com/rss/news?channel=next-gen&sort=latest, https://n4g.com/rss/news?channel=ps5&sort=latest
 ```
 
 ### Run once
