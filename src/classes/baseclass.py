@@ -56,12 +56,11 @@ class RedditBaseClass:
             if self.flairids is not None:
                 if not self.flairids.is_template():
                     raise Exception("You need to use a flair template id!  I.E. 8923hdnd-3829493f-1383eh28 and not a flair name!")
-                if self.flairids.is_list():
-                    self.flairids = self.flairids.to_l()
-                    if len(self.flairids) != len(self.subrss):
+                else:
+                    if len(self.flairids.get_flair()) != len(self.subrss):
                         raise Exception("Your subreddits/feeds amount does not match your flairids amount.")
                     else:
-                        for item, flair in zip(self.subrss, self.flairids):
+                        for item, flair in zip(self.subrss, self.flairids.get_flair()):
                             item["flair"] = flair
                 print(self.subrss)
         except Exception:
