@@ -14,7 +14,7 @@ class Flair:
         return self.contains_char("None")
 
     def contains_char(self, char):
-        return char in self.get_flair()
+        return all(list(char in word for word in self.get_flair()))
 
     def get_flair(self):
         return self.flair
