@@ -30,15 +30,6 @@ class Parse_Reply_Bot(RedditBaseClass):
         self.error_delay = 140
 
 
-    def get_token(self):
-        """ Retrieves token for Reddit API."""
-        client_auth = requests.auth.HTTPBasicAuth(self.client, self.secret)
-        post_data = {'grant_type': 'password', 'username': self.user, 'password': self.password}
-        headers = {'User-Agent': self.user_agent}
-        response = requests.Session()
-        response2 = response.post(self.token_url, auth=client_auth, data=post_data, headers=headers)
-        self.token = response2.json()['access_token']
-        self.t_type = response2.json()['token_type']
 
     def check_for_database(self):
         for file in os.listdir(os.getcwd()):

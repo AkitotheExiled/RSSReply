@@ -40,9 +40,11 @@ class RedditBaseClass:
             self.subrss = []
             try:
                 self.flairids = Flair(self.CONFIG.get('flairs', 'FLAIR_IDS'))
-            except NoOptionError:
+            except (NoOptionError, TypeError):
                 self.logger.warning("Flair section could not be found! Script will continue without flairs.",
                                   exc_info=True)
+                self.flairids = None
+            if self.flairids.is_none():
                 self.flairids = None
             try:
                 for k,v in self.CONFIG.items('suburl'):
