@@ -105,7 +105,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                                         while True:
                                             try:
                                                 if flairid is not None:
-                                                    submission = self.reddit.subreddit(sub).submit(title, url=link, resubmit=False, flairid=flairid)
+                                                    submission = self.reddit.subreddit(sub).submit(title, url=link, resubmit=False, flair_id=flairid)
                                                 else:
                                                     submission = self.reddit.subreddit(sub).submit(title, url=link,
                                                                                                    resubmit=False
