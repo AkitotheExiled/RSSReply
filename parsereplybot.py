@@ -104,11 +104,16 @@ class Parse_Reply_Bot(RedditBaseClass):
                                     if not does_exist:
                                         while True:
                                             try:
-                                                submission = self.reddit.subreddit(sub).submit(title, url=link, resubmit=False)
-                                                if self.reddit.subreddit(sub).user_is_moderator:
-                                                    submission.mod.approve()
-                                                    if flairid is not None:
-                                                        submission.mod.flair(flair_template_id=flairid)
+                                                if flairid is not None:
+                                                    submission = self.reddit.subreddit(sub).submit(title, url=link, resubmit=False, flairid=flairid)
+                                                else:
+                                                    submission = self.reddit.subreddit(sub).submit(title, url=link,
+                                                                                                   resubmit=False
+                                                                                                   )
+                                                    if self.reddit.subreddit(sub).user_is_moderator:
+                                                        submission.mod.approve()
+                                                        if flairid is not None:
+                                                            submission.mod.flair(flair_template_id=flairid)
                                                 print(f"Posting in {sub}, title: {item['title']}")
                                                 break
                                             except (APIException, RedditAPIException):
