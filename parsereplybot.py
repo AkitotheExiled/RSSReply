@@ -106,6 +106,8 @@ class Parse_Reply_Bot(RedditBaseClass):
                                             try:
                                                 if flairid is not None:
                                                     submission = self.reddit.subreddit(sub).submit(title, url=link, resubmit=False, flair_id=flairid)
+                                                    if self.reddit.subreddit(sub).user_is_moderator:
+                                                        submission.mod.approve()
                                                 else:
                                                     submission = self.reddit.subreddit(sub).submit(title, url=link,
                                                                                                    resubmit=False
