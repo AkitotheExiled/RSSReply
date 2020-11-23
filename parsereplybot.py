@@ -93,7 +93,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                                     break
                                 link = item["link"]
                                 title = item["title"]
-                                title_exist = self.exist_check_and_dont_add(Articles, title=item["title"])
+                                title_exist = self.exist_check_and_dont_add(Articles, link=item["link"])
                                 i+=1
                                 if title_exist:
                                     print(f"Article: {title}, already exists in the database/subreddit!")
