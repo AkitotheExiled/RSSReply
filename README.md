@@ -5,6 +5,17 @@
 A script that takes information from a RSS Feed and submits it onto your subreddit of choice!
 - - - -
 
+Recent Changes
+| Date | Description | Link |
+| --- | --- | --- |
+| 6/14/22 | PREFER_IMAGES flag added | [NEW](#prefer-images) |
+| 6/14/22 | DEVMODE flag added | [NEW](#devmode) |
+| 6/14/22 | Feed_type will be **removed** next update | [NEW](#feed-type) |
+| 6/14/22 | Support added for submitting single images and gallerys from RSS Feeds | [NEW](#prefer-images) |
+| 6/14/22 | Reworked fetch/post logic.  Recommended updates to delay as follows | [NEW](#delay) |
+
+
+- - - -
 * [Getting started](#installing-script)
     * [Installing Python](#installing-python)
     * [Installing requirements](#installing-requirements)
@@ -15,8 +26,10 @@ A script that takes information from a RSS Feed and submits it onto your subredd
         * [subreddit](#subreddit)
         * [rssurl](#rss-feed)
         * [run_once](#run-once)
-        * [feed_type](#feed-type)
+        * [[*CHANGED*]feed_type](#feed-type)
         * [flairids](#flair-ids)
+        * [[**NEW**]devmode](#devmode)
+        * [[**NEW**]prefer_images](#prefer-images)
         * [Putting it all together](#putting-it-together)
 * [Running your script](#running-your-script)
 * [Bug tracking](#contributing)
@@ -124,16 +137,25 @@ RUN_ONCE=false
 ```
 
 ### Feed type
-* Sometimes RSS feeds contain more than one item(item indicates latest articles/mangas).
-* You can do the following feed_types, 
-* latest *Grabs the first item only.*
-* 1-10 *Grabs 1,2,3,4,etc items.*
-* one-ten *Grabs one,two,three,four,etc items.* 
-* all  *Grabs all items available, meaning if your rss feed has items with links from 2018-2020.  It will post every article from 2018-2020.*  
-* **I recommend latest as most rss feeds will only ever have one item and the ones that have multiples, the latest article/manga/post is in that one item.**
+**LEAVE ON DEFAULT SETTING.  WILL BE REMOVED IN 1.11**
 ```
 FEED_TYPE=latest
 ```
+
+### Devmode
+* Leave on default
+
+```
+DEVMODE=false
+```
+
+### Prefer_images
+* RSS Urls that contain direct links to images will now upload the image directly when this setting is on.
+
+```
+PREFER_IMAGES=true
+```
+
 ### Flair ids
 * Flair ids are not required.  Script will issue a warning if no flair ids are mentioned.
 * Grab the flair id for post flairs from your subreddit

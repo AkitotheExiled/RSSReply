@@ -100,7 +100,10 @@ class Parse_Reply_Bot(RedditBaseClass):
                                     #break
                                 link = item["link"]
                                 title = item["title"]
-                                images = self.save_replace_external_images_locally(item["images"])
+                                if self.prefer_images:
+                                    images = self.save_replace_external_images_locally(item["images"])
+                                else:
+                                    images = []
                                 title_exist = self.exist_check_and_dont_add(Articles, link=item["link"])
                                 i+=1
                                 if title_exist:
