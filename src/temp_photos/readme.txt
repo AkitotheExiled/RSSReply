@@ -1,0 +1,1 @@
+photos go here and are automatically deleted once uploaded to reddit
