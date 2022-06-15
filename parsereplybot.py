@@ -10,15 +10,20 @@ from rssparse import get_links_titles_guuids
 
 
 
+SCRIPT_DIR = os.path.dirname(__file__)
 
 
 
 class Parse_Reply_Bot(RedditBaseClass):
 
+
     def __init__(self):
         super().__init__()
-        self.user_agent = "PC:ParseNReply :V1.06 by ScoopJr"
-        print('Starting up...', self.user_agent)
+        self.user_agent = "PC:ParseNReply :V1.10 by ScoopJr"
+        if self.devmode:
+            print("DEVMODE ENABLED",self.user_agent)
+        else:
+            print(self.user_agent)
         self.reddit = praw.Reddit(client_id=self.client,
                                   client_secret=self.secret,
                                   password=self.password,
@@ -28,6 +33,7 @@ class Parse_Reply_Bot(RedditBaseClass):
         self.queue = {"data": []}
         self.db = Database()
         self.error_delay = 140
+        self.images_to_delete = []
 
 
 
@@ -86,51 +92,94 @@ class Parse_Reply_Bot(RedditBaseClass):
                     rss_text = self.get_text_from_rssfeed(url)
                     if rss_text:
                         data = get_links_titles_guuids(text=rss_text)
+                        print(data)
                         if data:
                             i = 0
                             for item in data["data"]:
-                                if i == self.count:
-                                    break
+                                #if i == self.count:
+                                    #break
                                 link = item["link"]
                                 title = item["title"]
+                                images = self.save_replace_external_images_locally(item["images"])
                                 title_exist = self.exist_check_and_dont_add(Articles, link=item["link"])
                                 i+=1
                                 if title_exist:
-                                    print(f"Article: {title}, already exists in the database/subreddit!")
+                                    print(f"Article Exists? -> {title_exist}. Skipping to the next article. . .")
                                     continue
                                 else:
-                                    does_exist = self.exist_check_or_add_posts(Articles, id=item["id"], title=item["title"],
-                                                                           link=item["link"])
-                                    if not does_exist:
-                                        while True:
-                                            try:
-                                                if flairid is not None:
+                                    self.exist_check_or_add_posts(Articles, id=item["id"],
+                                                                            title=item["title"],
+                                                                            link=item["link"])
+
+                                    while True:
+                                        try:
+                                            if flairid is not None:
+                                                print(
+                                                    f"Article: ({item['title']}, {link}) posted in {sub} with {flairid}")
+                                                if len(images) > 1:
+                                                    submission = self.reddit.subreddit(sub).submit_gallery(title, images= images , flair_id=flairid)
+                                                elif len(images) < 2 and len(images) > 0:
+                                                    submission = self.reddit.subreddit(sub).submit_image(title,
+                                                                                                         image_path=
+                                                                                                         images[0]['image_path'],
+                                                                                                         resubmit=False,
+                                                                                                   flair_id=flairid)
+                                                else:
                                                     submission = self.reddit.subreddit(sub).submit(title, url=link, resubmit=False, flair_id=flairid)
-                                                    if self.reddit.subreddit(sub).user_is_moderator:
-                                                        submission.mod.approve()
+                                                if self.reddit.subreddit(sub).user_is_moderator:
+                                                    submission.mod.approve()
+                                                break
+                                            else:
+                                                print(f"Article: ({item['title']}, {link}) posted in {sub} without flair")
+
+                                                if len(images) > 1:
+
+                                                    submission = self.reddit.subreddit(sub).submit_gallery(title, images=images )
+                                                elif len(images) < 2 and len(images) > 0:
+                                                    submission = self.reddit.subreddit(sub).submit_image(title,
+                                                                                                         image_path=
+                                                                                                         images[0]['image_path'],
+                                                                                                         resubmit=False)
                                                 else:
                                                     submission = self.reddit.subreddit(sub).submit(title, url=link,
-                                                                                                   resubmit=False
-                                                                                                   )
-                                                    if self.reddit.subreddit(sub).user_is_moderator:
-                                                        submission.mod.approve()
-                                                        if flairid is not None:
-                                                            submission.mod.flair(flair_template_id=flairid)
-                                                print(f"Posting in {sub}, title: {item['title']}")
+                                                                                                   resubmit=False)
+                                                if self.reddit.subreddit(sub).user_is_moderator:
+                                                    submission.mod.approve()
+                                                    if flairid is not None:
+                                                        submission.mod.flair(flair_template_id=flairid)
                                                 break
-                                            except (APIException, RedditAPIException):
-                                                self.logger.error("Error has occurred within the API", exc_info=True)
-                                                time.sleep(self.error_delay)
-                                                break
-                                    else:
-                                        print(f"Title: {item['title']} already exists in {sub}. Continuing...")
+
+                                        except (APIException, RedditAPIException):
+                                            self.logger.error("Error has occurred within the API", exc_info=True)
+                                            time.sleep(self.error_delay)
+                                    self.delete_specific_images()
+
+
                 if self.run_once:
                     break
                 else:
-                    print(f"Waiting {self.delay} seconds before attempting to pull next subreddit/article.")
-                    time.sleep(self.delay)
+                    print(f"Waiting 2 seconds before attempting to pull next subreddit/article.")
+                    time.sleep(2)
 
 
+    def save_replace_external_images_locally(self, ext_images):
+        local_imgs = []
+        save_location = "/src/temp_photos/"
+
+        for ext_img in ext_images:
+            src = ext_img['image_path']
+            local_save_path = f'{SCRIPT_DIR}' + f'{save_location}' + src.rsplit('/', 1)[-1]
+
+            with open(local_save_path, 'wb') as f:
+                f.write(requests.get(src).content)
+                f.close()
+            self.images_to_delete.append(local_save_path)
+            local_imgs.append({'image_path': local_save_path})
+        return local_imgs
+
+    def delete_specific_images(self):
+        for img_path in self.images_to_delete:
+            os.remove(img_path)
 
 if __name__ == '__main__':
     bot = Parse_Reply_Bot()

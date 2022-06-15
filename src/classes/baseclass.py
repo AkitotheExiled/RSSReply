@@ -38,6 +38,8 @@ class RedditBaseClass:
             self.run_once = self.CONFIG.getboolean('main', 'RUN_ONCE')
             self.count = get_int(self.CONFIG.get('main', 'FEED_TYPE'))
             self.subrss = []
+            self.devmode = self.CONFIG.getboolean('main', 'DEVMODE')
+            self.prefer_images = self.CONFIG.getboolean('main', 'PREFER_IMAGES')
             try:
                 self.flairids = Flair(self.CONFIG.get('flairs', 'FLAIR_IDS'))
             except (NoOptionError, TypeError):
