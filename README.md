@@ -149,7 +149,7 @@ FEED_TYPE=latest
 DEVMODE=false
 ```
 
-### Prefer_images
+### Prefer-images
 * RSS Urls that contain direct links to images will now upload the image directly when this setting is on.
 
 ```

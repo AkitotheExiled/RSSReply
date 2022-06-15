@@ -161,8 +161,8 @@ class Parse_Reply_Bot(RedditBaseClass):
                 if self.run_once:
                     break
                 else:
-                    print(f"Waiting 2 seconds before attempting to pull next subreddit/article.")
-                    time.sleep(2)
+                    print(f"Waiting {self.delay} seconds before attempting to pull next subreddit/article.")
+                    time.sleep(self.delay)
 
 
     def save_replace_external_images_locally(self, ext_images):
