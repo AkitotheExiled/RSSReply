@@ -40,6 +40,7 @@ class RedditBaseClass:
             self.subrss = []
             self.devmode = self.CONFIG.getboolean('main', 'DEVMODE')
             self.prefer_images = self.CONFIG.getboolean('main', 'PREFER_IMAGES')
+            self.post_desc = self.CONFIG.getboolean('main', 'POST_DESC')
             try:
                 self.flairids = Flair(self.CONFIG.get('flairs', 'FLAIR_IDS'))
             except (NoOptionError, TypeError):
