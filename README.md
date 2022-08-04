@@ -8,6 +8,8 @@ A script that takes information from a RSS Feed and submits it onto your subredd
 Recent Changes
 | Date | Description | Link |
 | --- | --- | --- |
+| 8/4/22 | POST_DESC flag added | [NEW](#post-desc) |
+| 8/4/22 | COMMENT_DESC flag added | [NEW](#comment-desc) |
 | 6/14/22 | PREFER_IMAGES flag added | [NEW](#prefer-images) |
 | 6/14/22 | DEVMODE flag added | [NEW](#devmode) |
 | 6/14/22 | Feed_type will be **removed** next update | [NEW](#feed-type) |
@@ -28,8 +30,10 @@ Recent Changes
         * [run_once](#run-once)
         * [[*CHANGED*]feed_type](#feed-type)
         * [flairids](#flair-ids)
-        * [[**NEW**]devmode](#devmode)
-        * [[**NEW**]prefer_images](#prefer-images)
+        * [[NEW]devmode](#devmode)
+        * [[NEW]prefer_images](#prefer-images)
+        * [[**NEW**]comment-desc](#comment-desc)
+        * [[**NEW**]post-desc](#post-desc)
         * [Putting it all together](#putting-it-together)
 * [Running your script](#running-your-script)
 * [Bug tracking](#contributing)
@@ -156,6 +160,21 @@ DEVMODE=false
 PREFER_IMAGES=true
 ```
 
+### Comment-desc
+* Set to true to allow the bot to comment the item description in the comments
+
+```
+COMMENT_DESC=false
+```
+
+### Post-desc
+* Set to true to change the bots behavior to post the description as a text post.
+* ONLY ENABLE IF YOUR RSS FEED AS TEXT IN THE DESCRIPTION!!
+
+```
+POST_DESC=false
+```
+
 ### Flair ids
 * Flair ids are not required.  Script will issue a warning if no flair ids are mentioned.
 * Grab the flair id for post flairs from your subreddit
@@ -181,6 +200,10 @@ SECRET=daklfanlfkanl392r29neorfjs
 DELAY=300
 RUN_ONCE=false
 FEED_TYPE=latest
+DEVMODE=false
+PREFER_IMAGES=true
+COMMENT_DESC=false
+POST_DESC=false
 
 [suburl]
 mysubredditexample : https://n4g.com/rss/news?channel=next-gen&sort=latest

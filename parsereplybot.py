@@ -19,7 +19,7 @@ class Parse_Reply_Bot(RedditBaseClass):
 
     def __init__(self):
         super().__init__()
-        self.user_agent = "PC:ParseNReply :V1.10 by ScoopJr"
+        self.user_agent = "PC:ParseNReply :V1.20 by ScoopJr"
         if self.devmode:
             print("DEVMODE ENABLED",self.user_agent)
         else:
@@ -34,6 +34,7 @@ class Parse_Reply_Bot(RedditBaseClass):
         self.db = Database()
         self.error_delay = 140
         self.images_to_delete = []
+        self.resubmit = True
 
 
 
@@ -80,8 +81,104 @@ class Parse_Reply_Bot(RedditBaseClass):
         except Exception:
             self.logger.error("Error getting data from rss feed", exc_info=True)
 
+    def sort_and_exist_check_posts(self, data):
+        for item in data["data"]:
+            link = item["link"]
+            title = item["title"]
+            desc = item["desc"]
+            if self.prefer_images:
+                images = self.save_replace_external_images_locally(item["images"])
+            else:
+                images = []
+            title_exist = self.exist_check_and_dont_add(Articles, link=item["link"])
 
-    def main(self):
+            if title_exist:
+                print(f"Article Exists? -> {title_exist}. Skipping to the next article. . .")
+                return False
+            else:
+                self.exist_check_or_add_posts(Articles, id=item["id"],
+                                              title=item["title"],
+                                              link=item["link"])
+                return {"title": title, "link": link, "desc": desc, "images": images}
+
+    def handle_post_logic(self, item, sub, flairid=None):
+        if flairid is not None:
+            print(
+                f"Article: ({item['title']}, {item['link']}) posted in {sub} with {flairid}")
+            if item['images']:
+                if len(item['images']) > 1:
+                    submission = self.reddit.subreddit(sub).submit_gallery(item['title'],
+                                                                           images=item[
+                                                                               'images'],
+                                                                           flair_id=flairid)
+                elif len(item['images']) < 2 and len(item['images']) > 0:
+                    submission = self.reddit.subreddit(sub).submit_image(item['title'],
+                                                                         image_path=
+                                                                         item['images'][0][
+                                                                             'image_path'],
+                                                                         resubmit=self.resubmit,
+                                                                         flair_id=flairid)
+            else:
+                try:
+                    if self.prefer_desc:
+                        submission = self.reddit.subreddit(sub).submit(item['title'],
+                                                                       selftext=item['desc'],
+                                                                       resubmit=self.resubmit,
+                                                                       flair_id=flairid)
+                    else:
+                        submission = self.reddit.subreddit(sub).submit(item['title'],
+                                                                       url=item['link'],
+                                                                       resubmit=self.resubmit,
+                                                                       flair_id=flairid)
+                        if self.comment_desc and len(item['desc']) >= 1 and not self.prefer_desc:
+                            submission.reply(body=item['desc'])
+                        if self.reddit.subreddit(sub).user_is_moderator:
+                            submission.mod.approve()
+                except RedditAPIException as exc:
+                    if not str(exc).startswith('ALREADY_SUB'):
+                        raise
+                    else:
+                        self.exist_check_or_add_posts(Articles, id=item["id"],
+                                                      title=item["title"],
+                                                      link=item["link"])
+
+
+        else:
+            print(
+                f"Article: ({item['title']}, {item['link']}) posted in {sub} without {flairid}")
+            if item['images']:
+                if len(item['images']) > 1:
+                    submission = self.reddit.subreddit(sub).submit_gallery(item["title"],
+                                                                           images=item[
+                                                                               'images'])
+                    if self.comment_desc and len(item['desc']) >= 1:
+                        submission.reply(body=item['desc'])
+                elif len(item['images']) < 2 and len(item['images']) > 0:
+                    submission = self.reddit.subreddit(sub).submit_image(item["title"],
+                                                                     image_path=
+                                                                     item['images'][0][
+                                                                         'image_path'],
+                                                                     resubmit=self.resubmit)
+                    if self.comment_desc and len(item['desc']) >= 1:
+                        submission.reply(body=item['desc'])
+            else:
+                if self.prefer_desc:
+                    submission = self.reddit.subreddit(sub).submit(item['title'],
+                                                                   selftext=item['desc'],
+                                                                   resubmit=self.resubmit,
+                                                                   flair_id=flairid)
+                else:
+                    submission = self.reddit.subreddit(sub).submit(item["title"],
+                                                                   url=item["link"],
+                                                                   resubmit=self.resubmit)
+                    if self.comment_desc and len(item['desc']) >= 1:
+                        submission.reply(body=item['desc'])
+                if self.reddit.subreddit(sub).user_is_moderator:
+                    submission.mod.approve()
+                    if flairid is not None:
+                        submission.mod.flair(flair_template_id=flairid)
+
+    def run_loop(self):
         while True:
             for subart in self.subrss:
                 sub = subart["subreddit"]
@@ -94,90 +191,26 @@ class Parse_Reply_Bot(RedditBaseClass):
                         data = get_links_titles_guuids(text=rss_text)
 
                         if data:
-
-                            for item in data["data"]:
-                                link = item["link"]
-                                title = item["title"]
-                                desc = item["desc"]
-                                if self.prefer_images:
-                                    images = self.save_replace_external_images_locally(item["images"])
-                                else:
-                                    images = []
-                                title_exist = self.exist_check_and_dont_add(Articles, link=item["link"])
-
-                                if title_exist:
-                                    print(f"Article Exists? -> {title_exist}. Skipping to the next article. . .")
-
-                                else:
-                                    self.exist_check_or_add_posts(Articles, id=item["id"],
-                                                                            title=item["title"],
-                                                                            link=item["link"])
-
-                                    while True:
-                                        try:
-                                            if flairid is not None:
-                                                print(
-                                                    f"Article: ({item['title']}, {link}) posted in {sub} with {flairid}")
-                                                if len(images) > 1:
-                                                    submission = self.reddit.subreddit(sub).submit_gallery(title, images= images , flair_id=flairid)
-                                                elif len(images) < 2 and len(images) > 0:
-                                                    submission = self.reddit.subreddit(sub).submit_image(title,
-                                                                                                         image_path=
-                                                                                                         images[0]['image_path'],
-                                                                                                         resubmit=False,
-                                                                                                   flair_id=flairid)
-                                                else:
-                                                    try:
-                                                        submission = self.reddit.subreddit(sub).submit(title, url=link, resubmit=False, flair_id=flairid)
-                                                        if self.post_desc and len(desc) >= 1:
-                                                            submission.reply(body=desc)
-                                                        if self.reddit.subreddit(sub).user_is_moderator:
-                                                            submission.mod.approve()
-                                                    except RedditAPIException as exc:
-                                                        if not str(exc).startswith('ALREADY_SUB'):
-                                                            raise
-                                                        else:
-                                                            self.exist_check_or_add_posts(Articles, id=item["id"],
-                                                                                          title=item["title"],
-                                                                                          link=item["link"])
-
-                                                break
-                                            else:
-                                                print(f"Article: ({item['title']}, {link}) posted in {sub} without flair")
-
-                                                if len(images) > 1:
-                                                    submission = self.reddit.subreddit(sub).submit_gallery(title, images=images)
-                                                    if self.post_desc and len(desc) >= 1:
-                                                        submission.reply(body=desc)
-                                                elif len(images) < 2 and len(images) > 0:
-                                                    submission = self.reddit.subreddit(sub).submit_image(title,
-                                                                                                         image_path=
-                                                                                                         images[0]['image_path'],
-                                                                                                         resubmit=False)
-                                                    if self.post_desc and len(desc) >= 1:
-                                                        submission.reply(body=desc)
-                                                else:
-                                                    submission = self.reddit.subreddit(sub).submit(title, url=link,
-                                                                                                   resubmit=False)
-                                                    if self.post_desc and len(desc) >= 1:
-                                                        submission.reply(body=desc)
-                                                if self.reddit.subreddit(sub).user_is_moderator:
-                                                    submission.mod.approve()
-                                                    if flairid is not None:
-                                                        submission.mod.flair(flair_template_id=flairid)
-                                                break
-
-                                        except (APIException, RedditAPIException):
-                                            self.logger.error("Error has occurred within the API", exc_info=True)
-                                            time.sleep(self.error_delay)
-                                    self.delete_specific_images()
-
+                            item = self.sort_and_exist_check_posts(data)
+                            if not item:
+                                continue
+                            else:
+                                while True:
+                                    try:
+                                        self.handle_post_logic(item, sub, flairid=flairid)
+                                        break
+                                    except (APIException, RedditAPIException):
+                                        self.logger.error("Error has occurred within the API", exc_info=True)
+                                        time.sleep(self.error_delay)
+                                self.delete_specific_images()
 
                 if self.run_once:
                     break
                 else:
                     print(f"Waiting {self.delay} seconds before attempting to pull next subreddit/article.")
                     time.sleep(self.delay)
+    def main(self):
+       self.run_loop()
 
 
     def save_replace_external_images_locally(self, ext_images):
