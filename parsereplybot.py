@@ -64,7 +64,6 @@ class Parse_Reply_Bot(RedditBaseClass):
     def exist_check_and_dont_add(self, model, **kwargs):
         instance = self.db.session.query(model).filter_by(**kwargs).first()
         if instance:
-            self.delay+=10
             return True
         else:
             return False
@@ -187,9 +186,9 @@ class Parse_Reply_Bot(RedditBaseClass):
                 sub = subart["subreddit"]
                 rssurl = subart["rssurl"]
                 flairid = subart["flair"]
-                print(f"Getting RSS Feed... from {rssurl}")
                 url_count = 0
                 for url in rssurl.get_url():
+                    print(url)
                     self.delete_temp_images()
                     rss_text = self.get_text_from_rssfeed(url)
                     if rss_text:
