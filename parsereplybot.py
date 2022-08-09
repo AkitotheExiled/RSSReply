@@ -19,7 +19,7 @@ class Parse_Reply_Bot(RedditBaseClass):
 
     def __init__(self):
         super().__init__()
-        self.user_agent = "PC:ParseNReply :V1.20 by ScoopJr"
+        self.user_agent = "PC:ParseNReply :V1.21 by ScoopJr"
         if self.devmode:
             print("DEVMODE ENABLED",self.user_agent)
         else:
@@ -33,6 +33,8 @@ class Parse_Reply_Bot(RedditBaseClass):
         self.queue = {"data": []}
         self.db = Database()
         self.error_delay = 140
+        self.photo_dir = SCRIPT_DIR +  "/src/temp_photos/"
+        print(self.photo_dir)
         self.images_to_delete = []
         self.resubmit = True
 
@@ -178,6 +180,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                     if flairid is not None:
                         submission.mod.flair(flair_template_id=flairid)
 
+
     def run_loop(self):
         while True:
             for subart in self.subrss:
@@ -185,7 +188,9 @@ class Parse_Reply_Bot(RedditBaseClass):
                 rssurl = subart["rssurl"]
                 flairid = subart["flair"]
                 print(f"Getting RSS Feed... from {rssurl}")
+                url_count = 0
                 for url in rssurl.get_url():
+                    self.delete_temp_images()
                     rss_text = self.get_text_from_rssfeed(url)
                     if rss_text:
                         data = get_links_titles_guuids(text=rss_text)
@@ -196,14 +201,22 @@ class Parse_Reply_Bot(RedditBaseClass):
                                 continue
                             else:
                                 while True:
-                                    try:
-                                        self.handle_post_logic(item, sub, flairid=flairid)
-                                        break
-                                    except (APIException, RedditAPIException):
-                                        self.logger.error("Error has occurred within the API", exc_info=True)
-                                        time.sleep(self.error_delay)
-                                self.delete_specific_images()
+                                    if len(flairid) > 1:
+                                        try:
+                                            self.handle_post_logic(item, sub, flairid=flairid[url_count])
+                                            break
+                                        except (APIException, RedditAPIException):
+                                            self.logger.error("Error has occurred within the API", exc_info=True)
+                                            time.sleep(self.error_delay)
+                                    else:
+                                        try:
+                                            self.handle_post_logic(item, sub, flairid=flairid)
+                                            break
+                                        except (APIException, RedditAPIException):
+                                            self.logger.error("Error has occurred within the API", exc_info=True)
+                                            time.sleep(self.error_delay)
 
+                    url_count += 1
                 if self.run_once:
                     break
                 else:
@@ -228,9 +241,9 @@ class Parse_Reply_Bot(RedditBaseClass):
             local_imgs.append({'image_path': local_save_path})
         return local_imgs
 
-    def delete_specific_images(self):
-        for img_path in self.images_to_delete:
-            os.remove(img_path)
+    def delete_temp_images(self):
+        for img in os.scandir(self.photo_dir):
+            os.remove(img.path)
 
 if __name__ == '__main__':
     bot = Parse_Reply_Bot()
