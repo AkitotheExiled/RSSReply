@@ -10,7 +10,7 @@ from rssparse import get_links_titles_guuids
 
 
 
-SCRIPT_DIR = os.path.dirname(__file__)
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 
@@ -19,7 +19,7 @@ class Parse_Reply_Bot(RedditBaseClass):
 
     def __init__(self):
         super().__init__()
-        self.user_agent = "PC:ParseNReply :V1.21 by ScoopJr"
+        self.user_agent = "PC:ParseNReply :V1.21.1 by ScoopJr"
         if self.devmode:
             print("DEVMODE ENABLED",self.user_agent)
         else:
@@ -33,7 +33,7 @@ class Parse_Reply_Bot(RedditBaseClass):
         self.queue = {"data": []}
         self.db = Database()
         self.error_delay = 140
-        self.photo_dir = SCRIPT_DIR +  "/src/temp_photos/"
+        self.photo_dir = SCRIPT_DIR + "/src/temp_photos/"
         print(self.photo_dir)
         self.images_to_delete = []
         self.resubmit = True
