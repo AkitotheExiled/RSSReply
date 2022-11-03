@@ -19,7 +19,7 @@ class Parse_Reply_Bot(RedditBaseClass):
 
     def __init__(self):
         super().__init__()
-        self.user_agent = "PC:ParseNReply :V1.21.1 by ScoopJr"
+        self.user_agent = "PC:ParseNReply :V1.21.2 by ScoopJr"
         if self.devmode:
             print("DEVMODE ENABLED",self.user_agent)
         else:
@@ -103,6 +103,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                 return {"title": title, "link": link, "desc": desc, "images": images}
 
     def handle_post_logic(self, item, sub, flairid=None):
+        desc_n_link = item['desc'] + "\n" + item['link']
         if flairid is not None:
             print(
                 f"Article: ({item['title']}, {item['link']}) posted in {sub} with {flairid}")
@@ -112,6 +113,8 @@ class Parse_Reply_Bot(RedditBaseClass):
                                                                            images=item[
                                                                                'images'],
                                                                            flair_id=flairid)
+                    if self.comment_desc and len(item['desc']) >= 1:
+                        submission.reply(body=desc_n_link)
                 elif len(item['images']) < 2 and len(item['images']) > 0:
                     submission = self.reddit.subreddit(sub).submit_image(item['title'],
                                                                          image_path=
@@ -119,11 +122,13 @@ class Parse_Reply_Bot(RedditBaseClass):
                                                                              'image_path'],
                                                                          resubmit=self.resubmit,
                                                                          flair_id=flairid)
+                    if self.comment_desc and len(item['desc']) >= 1:
+                        submission.reply(body=desc_n_link)
             else:
                 try:
                     if self.prefer_desc:
                         submission = self.reddit.subreddit(sub).submit(item['title'],
-                                                                       selftext=item['desc'],
+                                                                       selftext=desc_n_link,
                                                                        resubmit=self.resubmit,
                                                                        flair_id=flairid)
                     else:
@@ -132,7 +137,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                                                                        resubmit=self.resubmit,
                                                                        flair_id=flairid)
                         if self.comment_desc and len(item['desc']) >= 1 and not self.prefer_desc:
-                            submission.reply(body=item['desc'])
+                            submission.reply(body=desc_n_link)
                         if self.reddit.subreddit(sub).user_is_moderator:
                             submission.mod.approve()
                 except RedditAPIException as exc:
@@ -153,7 +158,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                                                                            images=item[
                                                                                'images'])
                     if self.comment_desc and len(item['desc']) >= 1:
-                        submission.reply(body=item['desc'])
+                        submission.reply(body=desc_n_link)
                 elif len(item['images']) < 2 and len(item['images']) > 0:
                     submission = self.reddit.subreddit(sub).submit_image(item["title"],
                                                                      image_path=
@@ -161,11 +166,11 @@ class Parse_Reply_Bot(RedditBaseClass):
                                                                          'image_path'],
                                                                      resubmit=self.resubmit)
                     if self.comment_desc and len(item['desc']) >= 1:
-                        submission.reply(body=item['desc'])
+                        submission.reply(body=desc_n_link)
             else:
                 if self.prefer_desc:
                     submission = self.reddit.subreddit(sub).submit(item['title'],
-                                                                   selftext=item['desc'],
+                                                                   selftext=desc_n_link,
                                                                    resubmit=self.resubmit,
                                                                    flair_id=flairid)
                 else:
@@ -173,7 +178,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                                                                    url=item["link"],
                                                                    resubmit=self.resubmit)
                     if self.comment_desc and len(item['desc']) >= 1:
-                        submission.reply(body=item['desc'])
+                        submission.reply(body=desc_n_link)
                 if self.reddit.subreddit(sub).user_is_moderator:
                     submission.mod.approve()
                     if flairid is not None:
