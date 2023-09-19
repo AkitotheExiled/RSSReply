@@ -82,6 +82,9 @@ class Parse_Reply_Bot(RedditBaseClass):
         except Exception:
             self.logger.error("Error getting data from rss feed", exc_info=True)
 
+
+
+
     def sort_and_exist_check_posts(self, data):
         for item in data["data"]:
             link = item["link"]
@@ -109,6 +112,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                 f"Article: ({item['title']}, {item['link']}) posted in {sub} with {flairid}")
             if item['images']:
                 if len(item['images']) > 1:
+
                     submission = self.reddit.subreddit(sub).submit_gallery(item['title'],
                                                                            images=item[
                                                                                'images'],
@@ -171,8 +175,7 @@ class Parse_Reply_Bot(RedditBaseClass):
                 if self.prefer_desc:
                     submission = self.reddit.subreddit(sub).submit(item['title'],
                                                                    selftext=desc_n_link,
-                                                                   resubmit=self.resubmit,
-                                                                   flair_id=flairid)
+                                                                   resubmit=self.resubmit)
                 else:
                     submission = self.reddit.subreddit(sub).submit(item["title"],
                                                                    url=item["link"],
@@ -181,8 +184,6 @@ class Parse_Reply_Bot(RedditBaseClass):
                         submission.reply(body=desc_n_link)
                 if self.reddit.subreddit(sub).user_is_moderator:
                     submission.mod.approve()
-                    if flairid is not None:
-                        submission.mod.flair(flair_template_id=flairid)
 
 
     def run_loop(self):
@@ -193,28 +194,28 @@ class Parse_Reply_Bot(RedditBaseClass):
                 flairid = subart["flair"]
                 url_count = 0
                 for url in rssurl.get_url():
-                    print(url)
+                    print("RSS FEED URL ->", url)
                     self.delete_temp_images()
                     rss_text = self.get_text_from_rssfeed(url)
                     if rss_text:
                         data = get_links_titles_guuids(text=rss_text)
-
                         if data:
                             item = self.sort_and_exist_check_posts(data)
+                            print(item)
                             if not item:
                                 continue
                             else:
                                 while True:
-                                    if len(flairid) > 1:
+                                    if flairid == None:
                                         try:
-                                            self.handle_post_logic(item, sub, flairid=flairid[url_count])
+                                            self.handle_post_logic(item, sub, flairid=flairid)
                                             break
                                         except (APIException, RedditAPIException):
                                             self.logger.error("Error has occurred within the API", exc_info=True)
                                             time.sleep(self.error_delay)
                                     else:
                                         try:
-                                            self.handle_post_logic(item, sub, flairid=flairid)
+                                            self.handle_post_logic(item, sub, flairid=flairid[url_count])
                                             break
                                         except (APIException, RedditAPIException):
                                             self.logger.error("Error has occurred within the API", exc_info=True)
